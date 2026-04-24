@@ -1,4 +1,12 @@
 import os
+from django.conf import settings
+
+print("TEMPLATES DIRS:", settings.TEMPLATES[0]['DIRS'])
+print("BASE_DIR:", settings.BASE_DIR)
+
+
+
+import os
 import django
 from django.template import engines
 from django.test.client import RequestFactory
