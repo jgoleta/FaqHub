@@ -1,6 +1,6 @@
 {
   "functions": {
-    "Backend/settings/wsgi.py": {
+    "Backend/wsgi.py": {
       "runtime": "python3.9"
     }
   },
@@ -11,7 +11,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "Backend/settings/wsgi.py"
+      "dest": "Backend/wsgi.py"
     }
   ]
 }
