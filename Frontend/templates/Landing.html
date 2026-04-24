@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>ADNU · Faculty Availability Hub | Real‑time Professor Status</title>
+    <link rel="icon" type="image/png" href="https://imgur.com/FGy6T8S.png">
+    <!-- Google Fonts + Font Awesome -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* ========== ROOT VARIABLES (ADNU THEME) ========== */
+        :root {
+            --primary-color: #0f2b3d;
+            --palette-text-light: #ffffff;
+            --palette-accent: #1a4d8c;
+            --palette-accent-dark: #0f3b6d;
+            --palette-accent-glow: #2c6e9e;
+            --palette-success: #2e7d32;
+            --palette-warning: #f57c00;
+            --palette-info: #1976d2;
+            --palette-gray: #6b7280;
+            --palette-danger: #dc2626;
+            --palette-bg-light: #f9fbfe;
+            --palette-text: #111827;
+            --elev-1: 0 10px 30px rgba(16, 24, 40, 0.06);
+            --elev-2: 0 18px 40px rgba(16, 24, 40, 0.09);
+            --muted: rgba(17, 24, 39, 0.55);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #ffffff;
+            color: var(--palette-text);
+            line-height: 1.6;
+            scroll-behavior: smooth;
+        }
+
+        /* Scroll Progress Bar */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--palette-accent), var(--palette-accent-dark));
+            width: 0%;
+            z-index: 10000;
+            transition: width 0.1s ease;
+            box-shadow: 0 2px 8px rgba(26, 77, 140, 0.3);
+        }
+
+        /* Navbar */
+        .navigation-top {
+            background-color: var(--primary-color);
+            color: #fff;
+            padding: 1rem 0;
+            box-shadow: var(--elev-1);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .navigation-div {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .container {
+            width: 90%;
+            margin: 0 auto;
+            max-width: 1200px;
+        }
+
+        .logo {
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+        }
+
+        .logo span {
+            color: var(--palette-accent);
+            font-weight: 700;
+        }
+
+        .logo small {
+            font-size: 0.7rem;
+            font-weight: 400;
+            display: block;
+            letter-spacing: 0.3px;
+            color: #b9d0f0;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.8rem;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--palette-accent);
+        }
+
+        .nav-links li.active a {
+            color: var(--palette-accent);
+            border-bottom: 2px solid var(--palette-accent);
+            padding-bottom: 0.2rem;
+        }
+
+        .btn-primary {
+            background-color: var(--palette-accent-dark);
+            color: #fff;
+            padding: 0.6rem 1.3rem;
+            border-radius: 40px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--palette-accent-dark), var(--palette-accent));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(26, 77, 140, 0.3);
+        }
+
+        /* Hero */
+        .hero {
+            padding: 5rem 0 6rem;
+            background: linear-gradient(135deg, #eef6fc 0%, #ffffff 100%);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .hero::before {
+            content: "";
+            position: absolute;
+            top: -80px;
+            right: -80px;
+            width: 280px;
+            height: 280px;
+            background: var(--palette-accent);
+            opacity: 0.08;
+            border-radius: 50%;
+            filter: blur(70px);
+        }
+
+        .hero-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 2.5rem;
+            z-index: 1;
+            position: relative;
+        }
+
+        .hero-text {
+            flex: 1 1 520px;
+            animation: fadeInLeft 0.9s ease forwards;
+        }
+
+        .hero-text h1 {
+            font-size: clamp(2rem, 4vw, 3.3rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+            color: var(--primary-color);
+        }
+
+        .hero-text span {
+            color: var(--palette-accent);
+            background: linear-gradient(135deg, #1a4d8c, #2c6e9e);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .hero-text p {
+            color: var(--muted);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            max-width: 550px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-accent {
+            background-color: var(--palette-accent);
+            color: #fff;
+            padding: 0.8rem 2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            box-shadow: 0 5px 14px rgba(26, 77, 140, 0.25);
+        }
+
+        .btn-accent:hover {
+            background-color: var(--palette-accent-dark);
+            transform: translateY(-3px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--palette-accent);
+            color: var(--palette-accent);
+            padding: 0.8rem 2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .btn-outline:hover {
+            background-color: var(--palette-accent);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .hero-image {
+            flex: 1 1 440px;
+            text-align: center;
+            animation: fadeInRight 0.9s ease forwards;
+        }
+
+        .hero-image img {
+            max-width: 100%;
+            border-radius: 28px;
+            box-shadow: 0 20px 35px -8px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease;
+        }
+
+        .hero-image img:hover {
+            transform: scale(1.02);
+        }
+
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-40px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(40px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Color Legend Strip */
+        .legend-strip {
+            background: white;
+            border-radius: 60px;
+            padding: 0.8rem 1.5rem;
+            display: inline-flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.5rem;
+            margin: 2rem auto 0;
+            box-shadow: var(--elev-1);
+            width: fit-content;
+        }
+
+        .legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .legend-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 5rem 0;
+            background-color: var(--palette-bg-light);
+            text-align: center;
+        }
+
+        .features h2 {
+            font-size: clamp(1.8rem, 3vw, 2.4rem);
+            margin-bottom: 2rem;
+            color: var(--primary-color);
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 24px;
+            box-shadow: var(--elev-1);
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--elev-2);
+        }
+
+        .feature-icon {
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+            color: var(--palette-accent);
+        }
+
+        .feature-card h3 {
+            margin-bottom: 0.8rem;
+            font-size: 1.3rem;
+        }
+
+        /* How it works (color showcase) */
+        .color-showcase {
+            padding: 4rem 0;
+            background: white;
+        }
+
+        .color-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .color-card {
+            background: #f9fafc;
+            border-radius: 28px;
+            padding: 1.5rem;
+            text-align: center;
+            width: 160px;
+            transition: 0.2s;
+        }
+
+        .color-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+        }
+
+        /* About / Dual purpose */
+        .about {
+            padding: 5rem 0;
+            background: #ffffff;
+        }
+
+        .about-content {
+            display: flex;
+            align-items: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .about-text {
+            flex: 1;
+        }
+
+        .about-text h2 {
+            font-size: 1.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .about-image {
+            flex: 1;
+            text-align: center;
+        }
+
+        .about-image img {
+            max-width: 100%;
+            border-radius: 24px;
+            box-shadow: var(--elev-2);
+        }
+
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, #0f2b3d 0%, #1a4d8c 100%);
+            color: white;
+            text-align: center;
+            padding: 4rem 2rem;
+            border-radius: 40px;
+            margin: 2rem auto 4rem;
+        }
+
+        .cta-section h3 {
+            font-size: 1.8rem;
+        }
+
+        .cta-buttons {
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-light {
+            background: white;
+            color: #1a4d8c;
+            padding: 0.7rem 1.8rem;
+            border-radius: 40px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--primary-color);
+            color: var(--palette-text-light);
+            padding: 50px 0 20px;
+            text-align: center;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .footer-section.contact h4 {
+            color: var(--palette-accent);
+            font-size: 1.3rem;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .social-icons a {
+            background: rgba(255, 255, 255, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+            color: white;
+        }
+
+        .social-icons a:hover {
+            background: var(--palette-accent);
+            transform: translateY(-4px);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            padding-top: 1.2rem;
+            margin-top: 1.5rem;
+            font-size: 0.8rem;
+        }
+
+        /* Section transition */
+        section {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+        }
+
+        section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        @media (max-width: 768px) {
+            .navigation-div {
+                flex-direction: column;
+            }
+
+            .hero-buttons .btn-accent,
+            .hero-buttons .btn-outline {
+                width: 100%;
+                text-align: center;
+            }
+
+            .legend-strip {
+                gap: 0.8rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="scroll-progress" id="progressBar"></div>
+
+    <nav class="navigation-top">
+        <div class="navigation-div container">
+            <div class="logo">
+                ADNU<span>Hub</span><small>Professor Availability</small>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#hero">Home</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#color-guide">Color Guide</a></li>
+                <li><a href="#about">About</a></li>
+            </ul>
+            <a href="{% url 'login' %}" class="btn-primary"><i class="fas fa-arrow-right-to-bracket"></i> Get
+                Started</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="container hero-content">
+            <div class="hero-text">
+                <h1>Know when your professor is <span>actually available</span></h1>
+                <p>Stop sending messages asking if professors are in their offices. Our real‑time color‑coded system
+                    shows you instantly: green, orange, blue, gray, red — one glance, total clarity.</p>
+                <div class="hero-buttons">
+                    <a href="{% url 'login' %}" class="btn-accent"><i class="fas fa-chalkboard-user"></i> View
+                        Dashboard</a>
+                    <a href="#color-guide" class="btn-outline">Learn More</a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="https://placehold.co/600x450/1a4d8c/white?text=Faculty+Hub+Mockup"
+                    alt="Professor availability dashboard preview" style="background: #e9f0f9; object-fit: cover;">
+            </div>
+        </div>
+        <div class="legend-strip container">
+            <span class="legend-item"><span class="legend-dot" style="background:#2e7d32;"></span> Available</span>
+            <span class="legend-item"><span class="legend-dot" style="background:#f57c00;"></span> Busy</span>
+            <span class="legend-item"><span class="legend-dot" style="background:#1976d2;"></span> Virtual only</span>
+            <span class="legend-item"><span class="legend-dot" style="background:#6b7280;"></span> On leave</span>
+            <span class="legend-item"><span class="legend-dot" style="background:#dc2626;"></span> Absent</span>
+        </div>
+    </section>
+
+    <!-- Features Grid -->
+    <section class="features" id="features">
+        <div class="container">
+            <h2>Everything you need in one hub</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-chart-simple"></i></div>
+                    <h3>5‑Color Status System</h3>
+                    <p>Green = drop‑ins welcome, Orange = busy but on campus, Blue = virtual meetings only, Gray = on
+                        leave, Red = absent. No confusion.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-tablet-alt"></i></div>
+                    <h3>Kiosk Mode</h3>
+                    <p>Tablet outside each office shows real‑time status. Students see immediately if the professor is
+                        available before knocking.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-calendar-week"></i></div>
+                    <h3>Weekly Schedule Upload</h3>
+                    <p>Professors share their weekly timetable. Students can plan visits without endless email threads.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-bell"></i></div>
+                    <h3>Push Notifications</h3>
+                    <p>Students get instant alerts when a professor switches to “Available” — never miss an office hour
+                        again.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-clock"></i></div>
+                    <h3>Live Timestamps</h3>
+                    <p>“Updated 2 mins ago” — you always see the freshness of each status, building trust and accuracy.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-chalkboard"></i></div>
+                    <h3>Professor Dashboard</h3>
+                    <p>Simple toggle to change status, upload schedule, and manage “virtual only” links. One update,
+                        instantly visible to all.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Color Guide Section (Showcase) -->
+    <section class="color-showcase" id="color-guide">
+        <div class="container" style="text-align: center;">
+            <h2>Five colors tell you everything you need to know</h2>
+            <p style="color: var(--muted); max-width: 700px; margin: 0 auto 1rem;">No more guessing. Just glance at the
+                dot.</p>
+            <div class="color-grid">
+                <div class="color-card">
+                    <div class="color-circle" style="background:#2e7d32;"></div><strong>Available</strong>
+                    <p>On campus, open to drop‑ins</p>
+                </div>
+                <div class="color-card">
+                    <div class="color-circle" style="background:#f57c00;"></div><strong>Busy</strong>
+                    <p>In class / meeting</p>
+                </div>
+                <div class="color-card">
+                    <div class="color-circle" style="background:#1976d2;"></div><strong>Virtual only</strong>
+                    <p>Online meetings, Zoom link</p>
+                </div>
+                <div class="color-card">
+                    <div class="color-circle" style="background:#6b7280;"></div><strong>On leave</strong>
+                    <p>Not working today</p>
+                </div>
+                <div class="color-card">
+                    <div class="color-circle" style="background:#dc2626;"></div><strong>Absent</strong>
+                    <p>Sick / conference</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About / Benefits for Students & Professors -->
+    <section class="about" id="about">
+        <div class="container about-content">
+            <div class="about-text">
+                <h2>Built for students & professors alike</h2>
+                <p><i class="fas fa-check-circle" style="color:#2e7d32;"></i> <strong>For Students</strong> – See
+                    real‑time availability of any professor, filter by department, and get notified when they become
+                    free.</p>
+                <p><i class="fas fa-check-circle" style="color:#1a4d8c;"></i> <strong>For Professors</strong> – Update
+                    your status once (even from your phone), upload weekly schedule, and share virtual meeting links.
+                    Reduce interruptions and focus on teaching.</p>
+                <p><i class="fas fa-door-open"></i> Kiosk mode on your office door: tablet displays current status so
+                    students walking by know instantly.</p>
+                <div style="margin-top: 1.5rem;">
+                    <a href="{% url 'login' %}" class="btn-accent"><i class="fas fa-chalkboard-user"></i> I'm a
+                        Professor</a>
+                    <a href="{% url 'login' %}" class="btn-outline" style="margin-left: 12px;"><i
+                            class="fas fa-user-graduate"></i> I'm a Student</a>
+                </div>
+            </div>
+            <div class="about-image">
+                <img src="https://placehold.co/500x400/eef2fa/1a4d8c?text=Student+View+Preview"
+                    alt="Student dashboard preview">
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA to Login / Register -->
+    <div class="container">
+        <div class="cta-section">
+            <h3>Ready to simplify professor‑student communication?</h3>
+            <p style="margin: 0.5rem 0; opacity: 0.9;">Join ADNU Professor Availability today — free for all faculty and
+                students.</p>
+            <div class="cta-buttons">
+                <a href="{% url 'login' %}" class="btn-light"><i class="fas fa-sign-in-alt"></i> Login</a>
+                <a href="{% url 'login' %}" class="btn-light"
+                    style="background: rgba(255,255,255,0.2); color: white;"><i class="fas fa-user-plus"></i>
+                    Register</a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-section contact">
+                <h4>ADNU Professor Availability</h4>
+                <p><i class="fas fa-envelope"></i> <a href="mailto:help@adnu-availability.edu.ph"
+                        style="color:white; text-decoration: underline;">help@adnu-availability.edu.ph</a></p>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 Ateneo de Naga University · Professor Availability Hub · Real‑time status for smarter campus life
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Scroll progress bar
+        const progressBar = document.getElementById('progressBar');
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            progressBar.style.width = scrolled + '%';
+        });
+
+        // Intersection Observer for sections
+        const sections = document.querySelectorAll('section');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+        sections.forEach(section => observer.observe(section));
+
+        // manually add visible class to hero
+        document.querySelector('#hero')?.classList.add('visible');
+    </script>
+</body>
+
+</html>
