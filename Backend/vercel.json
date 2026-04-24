@@ -1,9 +1,13 @@
 {
   "builds": [
     {
-      "src": "**/*",
+      "src": "staticfiles/**/*",
       "use": "@vercel/static"
     }
   ],
-  "routes": [{ "src": "/static/(.*)", "dest": "/static/$1" }]
+  "routes": [
+    { "src": "/", "dest": "/index.html" },
+    { "src": "/dashboard", "dest": "/dashboard.html" },
+    { "src": "/dashboard/", "dest": "/dashboard.html" }
+  ]
 }
