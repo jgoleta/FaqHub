@@ -51,12 +51,12 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'urls'
 
-import os
+import os 
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [r'C:\Users\USER\Desktop\faqhub\Frontend\templates'],
+        'DIRS': [os.path.join(BASE_DIR, '..', 'Frontend', 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
